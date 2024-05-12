@@ -10,7 +10,7 @@ export const initCache = (cacheSize, blockSize) => {
 }
 
 export const createCache = (lines) => {
-  const columnTitles = ['INDEX', 'VALID', 'TAG', 'DATA', 'DIRTY BIT'];
+  const columnTitles = ['INDEX', 'VALID', 'TAG', 'DIRTY BIT', 'DATA'];
   const matrix = []; // Initialize with titles
 
   for (let i = 0; i < lines + 1; i++) {

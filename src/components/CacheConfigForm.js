@@ -1,17 +1,20 @@
 // CacheConfigForm.js
 import { useEffect } from 'react';
 import React, { useState } from 'react';
-import { load_direct, mostrar } from './Direct.js';
+import { load_direct, mostrar, generate_random_string } from './Direct.js';
 import { initCache, truncate_to_power_of_2 } from './CacheOperations';
 
-const CacheConfigForm = ({ cache, setCache }) => { //variables "globales"
+const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => { //variables "globales"
   let [cacheSize, setCacheSize] = useState('');
   let [blockSize, setBlockSize] = useState('');
+  let [memorySize, setMemorySize] = useState('');
   const [data, setData] = useState([]);
   const [address, setAddress] = useState([]);
   const [isCacheCreated, setIsCacheCreated] = useState(false); // Nuevo estado para rastrear si la caché se ha creado
   let newCache = [];
   let main_memory = [];
+
+
   useEffect(() => {
      console.log(cache)
   }, [cache]);
@@ -19,11 +22,19 @@ const CacheConfigForm = ({ cache, setCache }) => { //variables "globales"
   const handleSubmit = (e) => {
     setCacheSize(truncate_to_power_of_2(cacheSize));
     setBlockSize(truncate_to_power_of_2(blockSize));
+    setMemorySize(truncate_to_power_of_2(memorySize));
     e.preventDefault();
     newCache = initCache(cacheSize, blockSize);
     setCache(newCache);
     console.log(newCache);
     setIsCacheCreated(true); // Actualiza el estado para indicar que la caché se ha creado
+    // Inicializar memoria principal
+    main_memory = Array(memorySize);
+    for (let i = 0; i < memorySize; i++) {
+      memory[i] = generate_random_string((Math.floor(Math.random() * 8) + 3));
+      setMemory(memory);
+    }
+    console.log(memory);
   };
 
   const nextButtonClick = (e) => {
@@ -48,12 +59,10 @@ const CacheConfigForm = ({ cache, setCache }) => { //variables "globales"
     setData(dataInput);
     setAddress(addressInput);
 
-
-    mostrar(cache);
-    //load
-
     //load_direct(cache, add, 'BACK' ,cacheSize, blockSize, 512, main_memory);
-    setCache(load_direct(cache, add, 'BACK' ,cacheSize, blockSize, 512, main_memory));
+    setCache(load_direct(cache, add, 'BACK' ,cacheSize, blockSize, memorySize, memory));
+
+    
   }
 
   return (
@@ -76,7 +85,15 @@ const CacheConfigForm = ({ cache, setCache }) => { //variables "globales"
           placeholder="Block Size (power of 2)"
         />
       </label>
-      
+      <label>
+        Memory Size:
+        <input 
+          type="number" 
+          value={memorySize} 
+          onChange={(e) => setMemorySize(parseInt(e.target.value))}
+          placeholder="Memory Size (power of 2)"
+        />
+      </label>
       <button type="submit">Submit</button>
 
       <div className="instruction-type">

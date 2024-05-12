@@ -1,3 +1,5 @@
+//Direct.Js
+
 export function modify(index, tag, address, matrix, s_blq, main_memory) {
     const valid_bit = 1;
     const dirty_bit = 0;
@@ -47,14 +49,16 @@ export function direct_bin_segmentation(address, s_cc, s_blq, s_mp) {
   }
 
   export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, s_mp, main_memory) {
+    let newCache1 = [...cache];
+    let newMainMemory = [...main_memory]; // Crea una copia de main_memory
+
     if (address >= s_mp) {
-      return "Address should be smaller than Main memory";
+      return ["Address should be smaller than Main memory"];
     }
-    console.log(cache);
     let [bin_add, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
     // +1 to account for title row
     target_index = parseInt(target_index, 2) + 1;
-    let line = cache[target_index];
+    let line = newCache1[target_index];
 
     const [valid_bit, cached_tag, dirty_bit] = line.slice(1, 4);
     let w_mem = false;
@@ -70,19 +74,24 @@ export function direct_bin_segmentation(address, s_cc, s_blq, s_mp) {
       // CACHE MISS
       console.log(`Cache miss. Address ${address} Saving data to index ${target_index - 1}.`);
       if (write_policy === "BACK" && dirty_bit === 1) {
-        write_mem(main_memory,line,s_cc,s_blq,s_mp);
+        write_mem(newMainMemory,line,s_cc,s_blq,s_mp);
         w_mem = true;
       }
   
-      modify(target_index, tag, address, cache,s_blq, main_memory);
+      modify(target_index, tag, address, newCache1,s_blq, newMainMemory);
+      console.log(newMainMemory);
       cache_entry = line[4][parseInt(offset, 2)];
     }
-  
-    return cache;
-  }
-  
-  export function mostrar (cache) {
-    console.log(cache);
-  }
+    return newCache1;
+}
 
-  
+
+  export function generate_random_string(length) {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        randomString += charset[randomIndex];
+    }
+    return randomString;
+}
