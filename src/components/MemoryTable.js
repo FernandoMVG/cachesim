@@ -31,3 +31,4 @@ const MemoryTable = ({ data }) => {
 };
 
 export default MemoryTable;
+

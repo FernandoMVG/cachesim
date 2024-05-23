@@ -1,69 +1,122 @@
-// CacheConfigForm.js
-import { useEffect } from 'react';
-import React, { useState } from 'react';
-import { load_direct, mostrar, generate_random_string } from './Direct.js';
+
+import { useEffect, useState } from 'react';
+import { load_direct, store_direct, generate_random_string } from './Direct.js';
 import { initCache, truncate_to_power_of_2 } from './CacheOperations';
 
-const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => { //variables "globales"
-  let [cacheSize, setCacheSize] = useState('');
-  let [blockSize, setBlockSize] = useState('');
-  let [memorySize, setMemorySize] = useState('');
+const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
+  const [cacheSize, setCacheSize] = useState('');
+  const [blockSize, setBlockSize] = useState('');
+  const [memorySize, setMemorySize] = useState('');
   const [data, setData] = useState([]);
   const [address, setAddress] = useState([]);
-  const [isCacheCreated, setIsCacheCreated] = useState(false); // Nuevo estado para rastrear si la caché se ha creado
-  let newCache = [];
-  let main_memory = [];
-
+  const [isCacheCreated, setIsCacheCreated] = useState(false);
+  const [instructionType, setInstructionType] = useState('LOAD');
+  const [currentStep, setCurrentStep] = useState(0);
+  const [mainMemory, setMainMemory] = useState([]);
+  const [writePolicy, setWritePolicy] = useState('BACK');
+  const [log, setLog] = useState(''); // Nuevo estado para mantener el log
 
   useEffect(() => {
-     console.log(cache)
+    console.log(cache);
   }, [cache]);
 
   const handleSubmit = (e) => {
-    setCacheSize(truncate_to_power_of_2(cacheSize));
-    setBlockSize(truncate_to_power_of_2(blockSize));
-    setMemorySize(truncate_to_power_of_2(memorySize));
     e.preventDefault();
-    newCache = initCache(cacheSize, blockSize);
+    const validCacheSize = truncate_to_power_of_2(cacheSize);
+    const validBlockSize = truncate_to_power_of_2(blockSize);
+    const validMemorySize = truncate_to_power_of_2(memorySize);
+
+    setCacheSize(validCacheSize);
+    setBlockSize(validBlockSize);
+    setMemorySize(validMemorySize);
+
+    const newCache = initCache(validCacheSize, validBlockSize);
     setCache(newCache);
-    console.log(newCache);
-    setIsCacheCreated(true); // Actualiza el estado para indicar que la caché se ha creado
-    // Inicializar memoria principal
-    main_memory = Array(memorySize);
-    for (let i = 0; i < memorySize; i++) {
-      memory[i] = generate_random_string((Math.floor(Math.random() * 8) + 3));
-      setMemory(memory);
-    }
-    console.log(memory);
+    setIsCacheCreated(true);
+
+    const initializedMemory = Array(validMemorySize).fill().map(() => generate_random_string((Math.floor(Math.random() * 8) + 3)));
+    setMainMemory(initializedMemory);
+    setMemory(initializedMemory);
+    console.log(initializedMemory);
   };
 
-  const nextButtonClick = (e) => {
+  const handleLoadData = () => {
+    setCurrentStep(0);
+  };
+
+  const nextButtonClick = () => {
     if (!isCacheCreated) {
       alert('Por favor, crea la tabla de caché primero.');
       return;
     }
 
-    const instructionType = document.getElementById('instruction-select').value;
-    const dataInput = document.getElementById('data-input').value.split(',');
-    const addressInput = document.getElementById('address-input').value.split(',');
-    address.map((addr, index) => address[index] = parseInt(addr));
-    
-    if (dataInput[0] === "" || addressInput[0] === "") {
-      alert('Por favor, asegúrate de que los campos de datos y dirección no estén vacíos.');
+    if (currentStep >= address.length) {
+      alert('Todos los pasos completados. Carga nuevos elementos.');
       return;
     }
 
-    //eliminar el primer elemento de data y address
-    let dat = dataInput.shift();
-    let add = addressInput.shift();
-    setData(dataInput);
-    setAddress(addressInput);
+    const currentAddress = parseInt(address[currentStep]);
+    const currentData = instructionType === 'STORE' ? data[currentStep] : null;
+    let result;
 
-    //load_direct(cache, add, 'BACK' ,cacheSize, blockSize, 512, main_memory);
-    setCache(load_direct(cache, add, 'BACK' ,cacheSize, blockSize, memorySize, memory));
+    if (instructionType === 'LOAD') {
+      result = load_direct(cache, currentAddress, 'BACK', cacheSize, blockSize, memorySize, mainMemory);
+    } else if (instructionType === 'STORE') {
+      result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+    }
 
-    
-  }
+    setCache(result);
+    setLog((prevLog) => `${prevLog}\n${result.join(' ')}`); // Actualiza el log
+
+    setCurrentStep(currentStep + 1);
+  };
+
+  const fastForwardButtonClick = () => {
+    if (!isCacheCreated) {
+      alert('Por favor, crea la tabla de caché primero.');
+      return;
+    }
+
+    for (let step = currentStep; step < address.length; step++) {
+      const currentAddress = parseInt(address[step]);
+      const currentData = instructionType === 'STORE' ? data[step] : null;
+      let result;
+
+      if (instructionType === 'LOAD') {
+        result = load_direct(cache, currentAddress, 'BACK', cacheSize, blockSize, memorySize, mainMemory);
+      } else if (instructionType === 'STORE') {
+        result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+      }
+
+      setCache(result);
+      setLog((prevLog) => `${prevLog}\n${result.join(' ')}`); // Actualiza el log
+    }
+
+    setCurrentStep(address.length);
+  };
+
+  const handleInstructionChange = (e) => {
+    setInstructionType(e.target.value);
+  };
+
+  const handleWritePolicyChange = (e) => {
+    setWritePolicy(e.target.value);
+  };
+
+  const handleReset = () => {
+    setCache([]);
+    setMemory([]);
+    setCacheSize('');
+    setBlockSize('');
+    setMemorySize('');
+    setData([]);
+    setAddress([]);
+    setIsCacheCreated(false);
+    setInstructionType('LOAD');
+    setCurrentStep(0);
+    setMainMemory([]);
+    setLog(''); // Reinicia el log
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -99,26 +152,53 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => { //variable
       <div className="instruction-type">
         <h4>Tipo de Instrucciones</h4>
         <label htmlFor="instruction-select">Tipo:</label>
-        <select id="instruction-select">
+        <select id="instruction-select" value={instructionType} onChange={handleInstructionChange}>
           <option value="LOAD">Load</option>
           <option value="STORE">Store</option>
         </select>
       </div>
       <div className="instruction-data">
         <label htmlFor="data-input">Datos:</label>
-        <input type="text" id="data-input" value={data.join(',')} onChange={(e) => setData(e.target.value.split(','))} placeholder="Separados por coma"/>  
+        <input 
+          type="text" 
+          id="data-input" 
+          value={data.join(',')} 
+          onChange={(e) => setData(e.target.value.split(','))} 
+          placeholder="Separados por coma"
+          disabled={instructionType === 'LOAD'}
+        />
       </div>
       <div className="instruction-address">
         <label htmlFor="address-input">Dirección:</label>
-        <input type="text" id="address-input" value={address.join(',')} onChange={(e) => setAddress(e.target.value.split(',') )} placeholder="Separados por coma"/>
+        <input 
+          type="text" 
+          id="address-input" 
+          value={address.join(',')} 
+          onChange={(e) => setAddress(e.target.value.split(','))} 
+          placeholder="Separados por coma"
+        />
       </div>
+      <div className="write-policy">
+        <h4>Política de Escritura</h4>
+        <label htmlFor="write-policy-select">Política:</label>
+        <select id="write-policy-select" value={writePolicy} onChange={handleWritePolicyChange}>
+          <option value="BACK">Write Back</option>
+          <option value="THROUGH">Write Through</option>
+        </select>
+      </div>
+      <button type="button" onClick={handleLoadData}>Load Data</button>
       <div className="instruction-buttons">
         <button type="button" onClick={nextButtonClick}>Next</button>
-        <button type="button" onClick={nextButtonClick}>fast-Forward</button>
+        <button type="button" onClick={fastForwardButtonClick}>Fast-Forward</button>
+        <button type="button" onClick={handleReset}>Reset</button>
+      </div>
+      <div className="log-area">
+        <h4>Log</h4>
+        <textarea value={log} readOnly rows="10" cols="50"></textarea>
       </div>
     </form>
-
   );
 };
 
 export default CacheConfigForm;
+

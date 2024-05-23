@@ -1,13 +1,7 @@
 // CacheTable.js
-import React from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
-
-
+import React, { useEffect } from 'react';
 
 const CacheTable = ({ data }) => {
-
-
   useEffect(() => {
     console.log('Data updated:', data);
   }, [data]);
@@ -22,18 +16,16 @@ const CacheTable = ({ data }) => {
         </tr>
       </thead>
       <tbody>
-      {data.slice(1).map((row, index) => (
-        <tr key={index}>
-          {row.map((cell, cellIndex) => (
-            <td key={cellIndex}>
-              {/* Check if cell is an array and join its values into a single string */}
-              
-              {Array.isArray(cell) ? cell.join(', ') : cell}
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
+        {data.slice(1).map((row, index) => (
+          <tr key={index}>
+            {row.map((cell, cellIndex) => (
+              <td key={cellIndex}>
+                {Array.isArray(cell) ? cell.join(', ') : cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
     </table>
   );
 }
