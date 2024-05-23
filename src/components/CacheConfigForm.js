@@ -1,12 +1,13 @@
-
-import { useEffect, useState } from 'react';
+//CacheConfigForm.js
+import { useEffect } from 'react';
+import React, { useState } from 'react';
 import { load_direct, store_direct, generate_random_string } from './Direct.js';
 import { initCache, truncate_to_power_of_2 } from './CacheOperations';
 
 const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
-  const [cacheSize, setCacheSize] = useState('');
-  const [blockSize, setBlockSize] = useState('');
-  const [memorySize, setMemorySize] = useState('');
+  const [cacheSize, setCacheSize] = useState('16');
+  const [blockSize, setBlockSize] = useState('8');
+  const [memorySize, setMemorySize] = useState('32');
   const [data, setData] = useState([]);
   const [address, setAddress] = useState([]);
   const [isCacheCreated, setIsCacheCreated] = useState(false);
@@ -14,7 +15,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [mainMemory, setMainMemory] = useState([]);
   const [writePolicy, setWritePolicy] = useState('BACK');
-  const [log, setLog] = useState(''); // Nuevo estado para mantener el log
+  const [log, setLog] = useState('');
 
   useEffect(() => {
     console.log(cache);
@@ -42,6 +43,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
 
   const handleLoadData = () => {
     setCurrentStep(0);
+    setLog('');
   };
 
   const nextButtonClick = () => {
@@ -57,16 +59,19 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
 
     const currentAddress = parseInt(address[currentStep]);
     const currentData = instructionType === 'STORE' ? data[currentStep] : null;
-    let result;
 
+    let result;
     if (instructionType === 'LOAD') {
       result = load_direct(cache, currentAddress, 'BACK', cacheSize, blockSize, memorySize, mainMemory);
+      setCache(result.cache);
+      setMainMemory(result.mainMemory);
+      setLog(prevLog => `${prevLog}\nLOAD: Address ${currentAddress} -> Data ${mainMemory[currentAddress]}\n${result.message}`);
     } else if (instructionType === 'STORE') {
       result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+      setCache(result.cache);
+      setMainMemory(result.mainMemory);
+      setLog(prevLog => `${prevLog}\nSTORE: Address ${currentAddress} -> Data ${currentData}\n${result.message}`);
     }
-
-    setCache(result);
-    setLog((prevLog) => `${prevLog}\n${result.join(' ')}`); // Actualiza el log
 
     setCurrentStep(currentStep + 1);
   };
@@ -77,21 +82,27 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
       return;
     }
 
+    let result;
     for (let step = currentStep; step < address.length; step++) {
       const currentAddress = parseInt(address[step]);
       const currentData = instructionType === 'STORE' ? data[step] : null;
-      let result;
 
       if (instructionType === 'LOAD') {
         result = load_direct(cache, currentAddress, 'BACK', cacheSize, blockSize, memorySize, mainMemory);
+        setCache(result.cache);
+        setMainMemory(result.mainMemory);
+        setLog(prevLog => `${prevLog}\nLOAD: Address ${currentAddress} -> Data ${mainMemory[currentAddress]}\n${result.message}`);
       } else if (instructionType === 'STORE') {
         result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+        setCache(result.cache);
+        setMainMemory(result.mainMemory);
+        setLog(prevLog => `${prevLog}\nSTORE: Address ${currentAddress} -> Data ${currentData}\n${result.message}`);
       }
-
-      setCache(result);
-      setLog((prevLog) => `${prevLog}\n${result.join(' ')}`); // Actualiza el log
     }
 
+    // Vaciar las listas address y data
+    setAddress([]);
+    setData([]);
     setCurrentStep(address.length);
   };
 
@@ -115,7 +126,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
     setInstructionType('LOAD');
     setCurrentStep(0);
     setMainMemory([]);
-    setLog(''); // Reinicia el log
+    setLog('');
   };
 
   return (
@@ -192,13 +203,9 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
         <button type="button" onClick={fastForwardButtonClick}>Fast-Forward</button>
         <button type="button" onClick={handleReset}>Reset</button>
       </div>
-      <div className="log-area">
-        <h4>Log</h4>
-        <textarea value={log} readOnly rows="10" cols="50"></textarea>
-      </div>
+      <textarea value={log} readOnly rows="10" cols="50" />
     </form>
   );
 };
 
 export default CacheConfigForm;
-
