@@ -29,6 +29,7 @@ export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, 
     console.log(message);
     if (write_policy === "BACK" && dirty_bit === 1) {
       write_mem(newMainMemory, line, "DIRECT", s_cc, s_blq, s_mp);
+      
     }
 
     modify(target_index, tag, address, newCache1, s_blq, newMainMemory);
@@ -38,12 +39,14 @@ export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, 
   return { cache: newCache1, mainMemory: newMainMemory, message };
 }
 
+// Direct.js
+
 export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_mp, main_memory) {
   let newCache = [...cache];
   let newMainMemory = [...main_memory]; // Crea una copia de main_memory
 
   if (address >= s_mp) {
-    return { cache: newCache, mainMemory: newMainMemory, message: "Address should be smaller than Main memory" };
+      return { cache: newCache, mainMemory: newMainMemory, message: "Address should be smaller than Main memory" };
   }
 
   let [_, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
@@ -54,27 +57,31 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
   let message;
 
   if (valid_bit === 1 && cached_tag === tag) {
-    message = `Cache hit! Address ${address} at index: ${target_index - 1} modified to ${data}`;
-    console.log(message);
-    line[4][parseInt(offset, 2)] = data;
-    line[3] = 1; // Dirty bit set
-    cache_entry = line[4][parseInt(offset, 2)];
+      message = `Cache hit! Address ${address} at index ${target_index - 1} modified to ${data}`;
+      console.log(message);
+      line[4][parseInt(offset, 2)] = data;
+      line[3] = 1; // Dirty bit set
+      cache_entry = line[4][parseInt(offset, 2)];
   } else {
-    message = `Cache miss. Address ${address} Saving data to index ${target_index - 1} with modified value ${data}`;
-    console.log(message);
-    if (write_policy === "BACK" && dirty_bit === 1) {
-      write_mem(newMainMemory, line, "DIRECT", s_cc, s_blq, s_mp);
-    }
-    modify(target_index, tag, address, newCache, s_blq, newMainMemory);
-    newCache[target_index][4][parseInt(offset, 2)] = data;
-    newCache[target_index][3] = 1; // Dirty bit set
-    cache_entry = newCache[target_index][4][parseInt(offset, 2)];
+      message = `Cache miss. Address ${address} Saving data to index ${target_index - 1} with modified value ${data}`;
+      console.log(message);
+      if (write_policy === "BACK" && dirty_bit === 1) {
+          write_mem(newMainMemory, line, "DIRECT", s_cc, s_blq, s_mp);
+      }
+      modify(target_index, tag, address, newCache, s_blq, newMainMemory);
+      newCache[target_index][4][parseInt(offset, 2)] = data;
+      newCache[target_index][3] = 1; // Dirty bit set
+      cache_entry = newCache[target_index][4][parseInt(offset, 2)];
   }
 
   if (write_policy === "THROUGH") {
-    write_mem(newMainMemory, newCache[target_index], "DIRECT", s_cc, s_blq, s_mp);
+      write_mem(newMainMemory, newCache[target_index], "DIRECT", s_cc, s_blq, s_mp);
   }
 
+  // Actualizar la memoria principal
+  newMainMemory[address] = data;
+
+  console.log(newMainMemory);
   return { cache: newCache, mainMemory: newMainMemory, message };
 }
 
