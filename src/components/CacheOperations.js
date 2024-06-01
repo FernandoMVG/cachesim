@@ -55,3 +55,13 @@ export function write_mem(main_memory,line, type = "DIRECT",s_cc,s_blq,s_mp,targ
   }
   
 }
+
+export function generate_random_string(length) {
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let randomString = '';
+  for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      randomString += charset[randomIndex];
+  }
+  return randomString;
+}

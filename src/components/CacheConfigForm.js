@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { load_direct, store_direct, generate_random_string } from './Direct.js';
-import { initCache, truncate_to_power_of_2 } from './CacheOperations';
+import { load_direct, store_direct } from './Direct.js';
+import { initCache, truncate_to_power_of_2, generate_random_string } from './CacheOperations';
 import { HighlightContext } from './HighlightContext';
 
 const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
@@ -13,8 +13,12 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
     const [instructionType, setInstructionType] = useState('LOAD');
     const [mainMemory, setMainMemory] = useState([]);
     const [writePolicy, setWritePolicy] = useState('BACK');
-    const [log, setLog] = useState('');
+    const [log, setLog] = useState([]);
     const { setHighlightedAddress } = useContext(HighlightContext);
+
+    const [hitCount, setHitCount] = useState(0);
+    const [missCount, setMissCount] = useState(0);
+    const [comparisonLog, setComparisonLog] = useState('');
 
     useEffect(() => {
         console.log(cache);
@@ -64,16 +68,26 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
             result = load_direct(cache, currentAddress, 'BACK', cacheSize, blockSize, memorySize, mainMemory);
             setCache(result.cache);
             setMainMemory(result.mainMemory);
-            setLog(prevLog => `${prevLog}\nLOAD: Address ${currentAddress} -> Data ${mainMemory[currentAddress]}\n${result.message}`);
+            setLog(prevLog => [...prevLog, `LOAD: Address ${currentAddress} -> Data ${mainMemory[currentAddress]}\n${result.message}`]);
         } else if (instructionType === 'STORE') {
             result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
             setCache(result.cache);
             setMainMemory(result.mainMemory);
             setMemory(result.mainMemory);
-            setLog(prevLog => `${prevLog}\nSTORE: Address ${currentAddress} -> Data ${currentData}\n${result.message}`);
+            setLog(prevLog => [...prevLog, `STORE: Address ${currentAddress} -> Data ${currentData}\n${result.message}`]);
         }
 
-        // Eliminar el primer elemento de data y address
+        // Update hit/miss counts
+        if (result.hit) {
+            setHitCount(hitCount + 1);
+        } else {
+            setMissCount(missCount + 1);
+        }
+
+        // Log comparison details
+        setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.index}, Offset: ${result.offset}`);
+
+        // Remove first element from data and address
         setData(data.slice(1));
         setAddress(address.slice(1));
         setHighlightedAddress(currentAddress);
@@ -98,7 +112,10 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
         setIsCacheCreated(false);
         setInstructionType('LOAD');
         setMainMemory([]);
-        setLog('');
+        setLog([]);
+        setHitCount(0);
+        setMissCount(0);
+        setComparisonLog('');
     };
 
     const generateRandomDataAndAddresses = () => {
@@ -216,7 +233,31 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                 <button type="button" onClick={nextButtonClick} className="px-3 py-1 bg-yellow-500 text-white rounded-md">Next</button>
             </div>
 
-            <textarea value={log} readOnly rows="5" cols="50" className="mt-2 w-full p-1 border border-gray-300 rounded-md" />
+            <div className="mt-2 p-2 border rounded-md bg-white shadow-md">
+                <h4 className="text-lg font-medium mb-1">Log de Operaciones</h4>
+                <div className="max-h-64 overflow-y-auto">
+                    {log.map((entry, index) => (
+                        <div key={index} className="mb-2 p-2 bg-gray-100 rounded-md shadow-sm">
+                            {entry.split('\n').map((line, i) => (
+                                <p key={i} className="text-sm text-gray-800">{line}</p>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="mt-2 p-2 border rounded-md bg-white shadow-md">
+                <h4 className="text-lg font-medium mb-1">Estadísticas de Caché</h4>
+                <p>Hits: {hitCount}</p>
+                <p>Misses: {missCount}</p>
+                <p>Hit Rate: {(hitCount / (hitCount + missCount) * 100).toFixed(2)}%</p>
+                <p>Miss Rate: {(missCount / (hitCount + missCount) * 100).toFixed(2)}%</p>
+            </div>
+
+            <div className="mt-2 p-2 border rounded-md bg-white shadow-md">
+                <h4 className="text-lg font-medium mb-1">Comparaciones</h4>
+                <textarea value={comparisonLog} readOnly rows="10" cols="50" className="mt-2 w-full p-1 border border-gray-300 rounded-md" />
+            </div>
         </form>
     );
 };

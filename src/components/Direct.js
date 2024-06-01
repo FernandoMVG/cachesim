@@ -85,8 +85,6 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
   return { cache: newCache, mainMemory: newMainMemory, message };
 }
 
-
-
 export function generate_random_string(length) {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let randomString = '';
