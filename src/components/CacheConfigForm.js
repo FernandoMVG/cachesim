@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { load_direct, store_direct, generate_random_string } from './Direct.js';
 import { initCache, truncate_to_power_of_2 } from './CacheOperations';
+import { HighlightContext } from './HighlightContext';
 
 const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
     const [cacheSize, setCacheSize] = useState('16');
@@ -13,6 +14,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
     const [mainMemory, setMainMemory] = useState([]);
     const [writePolicy, setWritePolicy] = useState('BACK');
     const [log, setLog] = useState('');
+    const { setHighlightedAddress } = useContext(HighlightContext);
 
     useEffect(() => {
         console.log(cache);
@@ -44,6 +46,11 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
             return;
         }
 
+        if (instructionType === 'STORE' && data.length !== address.length) {
+            alert('La cantidad de datos y direcciones deben ser iguales para realizar una operación de STORE.');
+            return;
+        }
+
         if (address.length === 0) {
             alert('Todos los pasos completados. Carga nuevos elementos.');
             return;
@@ -69,6 +76,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
         // Eliminar el primer elemento de data y address
         setData(data.slice(1));
         setAddress(address.slice(1));
+        setHighlightedAddress(currentAddress);
     };
 
     const handleInstructionChange = (e) => {

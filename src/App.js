@@ -5,12 +5,14 @@ import Navbar from './components/Navbar';
 import CacheConfigForm from './components/CacheConfigForm';
 import CacheTable from './components/CacheTable';
 import MemoryTable from './components/MemoryTable';
+import { HighlightProvider } from './components/HighlightContext';
 
 const DirectMapped = () => {
     const [cache, setCache] = useState([]);
     const [memory, setMemory] = useState([]);
 
     return (
+        <HighlightProvider>
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Direct Mapped Cache Simulator</h1>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
@@ -23,6 +25,7 @@ const DirectMapped = () => {
                 </div>
             </div>
         </div>
+        </HighlightProvider>
     );
 };
 
