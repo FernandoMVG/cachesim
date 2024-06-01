@@ -8,6 +8,7 @@ const CacheTable = ({ data }) => {
 
     return (
         <div className="overflow-x-auto w-2/3">
+            <h2 className="text-lg font-semibold mb-2">Tabla de cache</h2>
             <table className="table-auto w-full border-collapse border border-gray-300">
                 <thead>
                     <tr>

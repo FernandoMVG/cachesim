@@ -1,0 +1,6 @@
+/* styles.css */
+.highlight {
+  background-color: yellow;
+  transition: background-color 0.5s ease;
+}
+
