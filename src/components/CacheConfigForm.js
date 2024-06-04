@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { load_direct, store_direct } from './Direct.js';
+import { load_fully, store_fully } from './Fully.js';
 import { initCache, truncate_to_power_of_2, generate_random_string } from './CacheOperations';
 import { HighlightContext } from './HighlightContext';
 
 const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
+    const location = useLocation();
     const [cacheSize, setCacheSize] = useState('16');
     const [blockSize, setBlockSize] = useState('8');
     const [memorySize, setMemorySize] = useState('32');
@@ -15,7 +18,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
     const [writePolicy, setWritePolicy] = useState('BACK');
     const [log, setLog] = useState([]);
     const { setHighlightedAddress } = useContext(HighlightContext);
-
+    const [replacePolicy, setReplacePolicy] = useState('FIFO');
     const [hitCount, setHitCount] = useState(0);
     const [missCount, setMissCount] = useState(0);
     const [comparisonLog, setComparisonLog] = useState('');
@@ -64,30 +67,36 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
         const currentData = instructionType === 'STORE' ? data[0] : null;
 
         let result;
-        if (instructionType === 'LOAD') {
-            result = load_direct(cache, currentAddress, 'BACK', cacheSize, blockSize, memorySize, mainMemory);
-            setCache(result.cache);
-            setMainMemory(result.mainMemory);
-            setLog(prevLog => [...prevLog, `LOAD: Address ${currentAddress} -> Data ${mainMemory[currentAddress]}\n${result.message}`]);
-        } else if (instructionType === 'STORE') {
-            result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
-            setCache(result.cache);
-            setMainMemory(result.mainMemory);
-            setMemory(result.mainMemory);
-            setLog(prevLog => [...prevLog, `STORE: Address ${currentAddress} -> Data ${currentData}\n${result.message}`]);
+        let logMessages = [];
+        if (location.pathname === '/fully-associative') {
+            if (instructionType === 'LOAD') {
+                result = load_fully(cache, currentAddress, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+            } else if (instructionType === 'STORE') {
+                result = store_fully(cache, currentAddress, currentData, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+            }
+            logMessages = result.log;
+        } else {
+            if (instructionType === 'LOAD') {
+                result = load_direct(cache, currentAddress, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+            } else if (instructionType === 'STORE') {
+                result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+            }
         }
+        console.log("Cacheche: ", result.cache)
+        setCache(result.cache);
+        console.log("MaintoMemory: ", result.mainMemory)
+        setMainMemory(result.mainMemory);
+        setMemory(result.mainMemory);
+        setLog(prevLog => [...prevLog, `${instructionType}: Address ${currentAddress} -> Data ${currentData ? currentData : mainMemory[currentAddress]}\n${result.message}`, ...logMessages]);
 
-        // Update hit/miss counts
         if (result.hit) {
             setHitCount(hitCount + 1);
         } else {
             setMissCount(missCount + 1);
         }
 
-        // Log comparison details
         setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.index}, Offset: ${result.offset}`);
 
-        // Remove first element from data and address
         setData(data.slice(1));
         setAddress(address.slice(1));
         setHighlightedAddress(currentAddress);
@@ -99,6 +108,10 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
 
     const handleWritePolicyChange = (e) => {
         setWritePolicy(e.target.value);
+    };
+
+    const handleReplacePolicyChange = (e) => {
+        setReplacePolicy(e.target.value);
     };
 
     const handleReset = () => {
@@ -119,7 +132,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
     };
 
     const generateRandomDataAndAddresses = () => {
-        const dataSize = 10; // You can adjust this size as needed
+        const dataSize = 10;
         const newAddresses = Array(dataSize).fill().map(() => Math.floor(Math.random() * memorySize).toString());
         setAddress(newAddresses);
 
@@ -127,7 +140,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
             const newData = Array(dataSize).fill().map(() => generate_random_string(8));
             setData(newData);
         } else {
-            setData([]); // Clear data if the instruction type is LOAD
+            setData([]);
         }
     };
 
@@ -228,6 +241,20 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                     </select>
                 </div>
             </div>
+
+            {location.pathname === '/fully-associative' && (
+                <div className="p-2 border rounded-md bg-white shadow-md">
+                    <h4 className="text-lg font-medium mb-1">Política de Reemplazo</h4>
+                    <div>
+                        <label htmlFor="replace-policy-select" className="block text-sm font-medium text-gray-700">Política:</label>
+                        <select id="replace-policy-select" value={replacePolicy} onChange={handleReplacePolicyChange} className="mt-1 block w-full p-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="FIFO">FIFO</option>
+                            <option value="LRU">LRU</option>
+                            <option value="RANDOM">RANDOM</option>
+                        </select>
+                    </div>
+                </div>
+            )}
 
             <div className="mt-2 flex space-x-1">
                 <button type="button" onClick={nextButtonClick} className="px-3 py-1 bg-yellow-500 text-white rounded-md">Next</button>

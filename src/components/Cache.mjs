@@ -261,6 +261,20 @@ export function set_bin_segmentation(address) {
   }
   
 
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
 //----------------------------------------------------//
 export function fully_associative_mapping(cache, address, tag, offset, replacement_policy, repl_queue, use_queue, write_policy, use = "FULLY") {
     let w_mem = false;
@@ -423,6 +437,28 @@ export function fully_associative_modify(cache, address, data, tag, offset, repl
     return fully_associative_modify(cache, address, data, tag, offset, replacement_policy, fifo_q, lru_q, write_policy);
   }
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //----------------------------------------------------//
 export function load_set(cache_arr, address, replacement_policy, write_policy = "BACK") {
     if (address >= s_mp) {

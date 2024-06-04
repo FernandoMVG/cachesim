@@ -85,15 +85,6 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
   return { cache: newCache, mainMemory: newMainMemory, message };
 }
 
-export function generate_random_string(length) {
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let randomString = '';
-  for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      randomString += charset[randomIndex];
-  }
-  return randomString;
-}
 
 export function direct_bin_segmentation(address, s_cc, s_blq, s_mp) {
   const bits_dir = Math.log2(s_mp);
@@ -115,5 +106,6 @@ export function modify(index, tag, address, matrix, s_blq, main_memory) {
   const data_block = main_memory.slice(start_address, start_address + s_blq);
   // Update cache values
   matrix[index].splice(1, 4, valid_bit, tag, dirty_bit, data_block);
+  console.log('Data block:', data_block)
   return data_block;
 }
