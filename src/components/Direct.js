@@ -78,10 +78,6 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
       write_mem(newMainMemory, newCache[target_index], "DIRECT", s_cc, s_blq, s_mp);
   }
 
-  // Actualizar la memoria principal
-  newMainMemory[address] = data;
-
-  console.log(newMainMemory);
   return { cache: newCache, mainMemory: newMainMemory, message };
 }
 

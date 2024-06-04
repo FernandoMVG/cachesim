@@ -197,9 +197,6 @@ export function store_fully(cache, address, data, replacement_policy, write_poli
   const [bin_add, tag, offset] = fully_bin_segmentation(address, s_mp, s_blq);
   const [curr_line, cache_entry, w_mem, hit, logMessages] = fully_associative_modify(newCache, address, data, tag, offset, replacement_policy, fifo_q, lru_q, write_policy, s_cc, s_blq, s_mp, newMainMemory1);
 
-  // Actualizar la memoria principal
-  newMainMemory1[address] = data;
-
   return { cache: newCache, mainMemory: newMainMemory1, message: hit ? `Cache hit! Address ${address} modified to ${data}` : `Cache miss. Address ${address} stored`, log: logMessages, hit: hit };
 }
 
