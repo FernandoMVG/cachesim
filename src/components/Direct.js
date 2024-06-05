@@ -11,6 +11,7 @@ export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, 
   }
   
   let [bin_add, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
+  let index = target_index;
   target_index = parseInt(target_index, 2) + 1;
   let line = newCache1[target_index];
 
@@ -38,7 +39,7 @@ export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, 
     cache_entry = newCache1[target_index][4][parseInt(offset, 2)];
   }
 
-  return { cache: newCache1, mainMemory: newMainMemory, message, hit, bin_add, tag, target_index, offset };
+  return { cache: newCache1, mainMemory: newMainMemory, message, hit, bin_add, tag, index, offset };
 }
 
 // Direct.js
@@ -52,6 +53,7 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
   }
 
   let [bin_add, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
+  let index = target_index;
   target_index = parseInt(target_index, 2) + 1;
   const line = newCache[target_index];
   const [valid_bit, cached_tag, dirty_bit] = line.slice(1, 4);
@@ -82,7 +84,7 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
       write_mem(newMainMemory, newCache[target_index], "DIRECT", s_cc, s_blq, s_mp);
   }
 
-  return { cache: newCache, mainMemory: newMainMemory, message, hit, bin_add, tag, target_index, offset };
+  return { cache: newCache, mainMemory: newMainMemory, message, hit, bin_add, tag, index, offset };
 }
 
 

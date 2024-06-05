@@ -16,7 +16,7 @@ const MemoryTable = ({ data }) => {
     }, [highlightedAddress]);
 
     return (
-        <div className="overflow-y-auto max-h-96 w-1/3" ref={tableRef}>
+        <div className="overflow-y-auto max-h-96 w-full" ref={tableRef}>
             <h2 className="text-lg font-semibold mb-2">Tabla de Memoria Principal</h2>
             <table className="table-auto w-full border-collapse border border-gray-300">
                 <tbody>

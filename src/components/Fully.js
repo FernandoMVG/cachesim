@@ -98,7 +98,7 @@ export function load_fully(cache, address, replacement_policy, write_policy = "B
   let [bin_add, tag, offset] = fully_bin_segmentation(address, s_mp, s_blq);
   let [curr_line, cache_entry, w_mem, hit, logMessages] = fully_associative_mapping(newCache2, address, tag, offset, replacement_policy, fifo_q, lru_q, write_policy, s_cc, s_blq, s_mp, newMainMemory);
 
-  return { cache: newCache2, mainMemory: newMainMemory, message: hit ? `Cache hit! Address ${address} found ${cache_entry}` : `Cache miss. Address ${address} loaded`, log: logMessages, hit: hit };
+  return { cache: newCache2, mainMemory: newMainMemory, message: hit ? `Cache hit! Address ${address} found ${cache_entry}` : `Cache miss. Address ${address} loaded`, log: logMessages, hit: hit, tag, offset };
 }
 
 export function fully_associative_modify(cache, address, data, tag, offset, replacement_policy, repl_queue, use_queue, write_policy, s_cc, s_blq, s_mp, main_memory) {
@@ -197,7 +197,7 @@ export function store_fully(cache, address, data, replacement_policy, write_poli
   const [bin_add, tag, offset] = fully_bin_segmentation(address, s_mp, s_blq);
   const [curr_line, cache_entry, w_mem, hit, logMessages] = fully_associative_modify(newCache, address, data, tag, offset, replacement_policy, fifo_q, lru_q, write_policy, s_cc, s_blq, s_mp, newMainMemory1);
 
-  return { cache: newCache, mainMemory: newMainMemory1, message: hit ? `Cache hit! Address ${address} modified to ${data}` : `Cache miss. Address ${address} stored`, log: logMessages, hit: hit };
+  return { cache: newCache, mainMemory: newMainMemory1, message: hit ? `Cache hit! Address ${address} modified to ${data}` : `Cache miss. Address ${address} stored`, log: logMessages, hit: hit, tag, offset };
 }
 
 function modify(index, tag, address, matrix, s_blq, main_memory) {

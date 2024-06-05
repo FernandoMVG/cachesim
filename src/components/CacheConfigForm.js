@@ -5,7 +5,7 @@ import { load_fully, store_fully } from './Fully.js';
 import { initCache, truncate_to_power_of_2, generate_random_string } from './CacheOperations';
 import { HighlightContext } from './HighlightContext';
 
-const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
+const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }) => {
     const location = useLocation();
     const [cacheSize, setCacheSize] = useState('16');
     const [blockSize, setBlockSize] = useState('8');
@@ -82,7 +82,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                 result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
             }
         }
-        console.log("Cacheche: ", result.hit)
+        console.log("Cacheche: ", result)
         setCache(result.cache);
         console.log("MaintoMemory: ", result.mainMemory)
         setMainMemory(result.mainMemory);
@@ -95,11 +95,16 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
             setMissCount(missCount + 1);
         }
 
-        setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.target_index}, Offset: ${result.offset}`);
+        //setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.index}, Offset: ${result.offset}`);
 
         setData(data.slice(1));
         setAddress(address.slice(1));
         setHighlightedAddress(currentAddress);
+
+        // Actualizar la segmentación
+        const { binAddress, tag, index, offset } = result;
+        setSegmentation({ binAddress, tag, index, offset });
+        
     };
 
     const handleInstructionChange = (e) => {
