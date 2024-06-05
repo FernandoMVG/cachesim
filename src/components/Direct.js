@@ -10,19 +10,21 @@ export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, 
     return { cache: newCache1, mainMemory: newMainMemory, message: "Address should be smaller than Main memory" };
   }
   
-  let [_, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
+  let [bin_add, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
   target_index = parseInt(target_index, 2) + 1;
   let line = newCache1[target_index];
 
   const [valid_bit, cached_tag, dirty_bit] = line.slice(1, 4);
   let cache_entry;
   let message;
+  let hit = false;
 
   // CACHE HIT
   if (valid_bit === 1 && cached_tag === tag) {
     cache_entry = line[4][parseInt(offset, 2)];
     message = `Cache hit! Address ${address} at index: ${target_index - 1} found ${cache_entry}`;
     console.log(message);
+    hit= true;
   } else {
     // CACHE MISS
     message = `Cache miss. Address ${address} Saving data to index ${target_index - 1}.`;
@@ -36,7 +38,7 @@ export function load_direct(cache, address, write_policy = "BACK", s_cc, s_blq, 
     cache_entry = newCache1[target_index][4][parseInt(offset, 2)];
   }
 
-  return { cache: newCache1, mainMemory: newMainMemory, message };
+  return { cache: newCache1, mainMemory: newMainMemory, message, hit, bin_add, tag, target_index, offset };
 }
 
 // Direct.js
@@ -49,16 +51,18 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
       return { cache: newCache, mainMemory: newMainMemory, message: "Address should be smaller than Main memory" };
   }
 
-  let [_, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
+  let [bin_add, tag, target_index, offset] = direct_bin_segmentation(address, s_cc, s_blq, s_mp);
   target_index = parseInt(target_index, 2) + 1;
   const line = newCache[target_index];
   const [valid_bit, cached_tag, dirty_bit] = line.slice(1, 4);
   let cache_entry;
   let message;
+  let hit = false;
 
   if (valid_bit === 1 && cached_tag === tag) {
       message = `Cache hit! Address ${address} at index ${target_index - 1} modified to ${data}`;
       console.log(message);
+      hit = true;
       line[4][parseInt(offset, 2)] = data;
       line[3] = 1; // Dirty bit set
       cache_entry = line[4][parseInt(offset, 2)];
@@ -78,7 +82,7 @@ export function store_direct(cache, address, data, write_policy, s_cc, s_blq, s_
       write_mem(newMainMemory, newCache[target_index], "DIRECT", s_cc, s_blq, s_mp);
   }
 
-  return { cache: newCache, mainMemory: newMainMemory, message };
+  return { cache: newCache, mainMemory: newMainMemory, message, hit, bin_add, tag, target_index, offset };
 }
 
 

@@ -82,7 +82,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                 result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
             }
         }
-        console.log("Cacheche: ", result.cache)
+        console.log("Cacheche: ", result.hit)
         setCache(result.cache);
         console.log("MaintoMemory: ", result.mainMemory)
         setMainMemory(result.mainMemory);
@@ -95,7 +95,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
             setMissCount(missCount + 1);
         }
 
-        setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.index}, Offset: ${result.offset}`);
+        setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.target_index}, Offset: ${result.offset}`);
 
         setData(data.slice(1));
         setAddress(address.slice(1));
@@ -231,6 +231,10 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                 </div>
             </div>
 
+            <div className="mt-2 flex space-x-1">
+                <button type="button" onClick={nextButtonClick} className="px-3 py-1 bg-yellow-500 text-white rounded-md">Next</button>
+            </div>
+
             <div className="p-2 border rounded-md bg-white shadow-md">
                 <h4 className="text-lg font-medium mb-1">Política de Escritura</h4>
                 <div>
@@ -256,10 +260,6 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                 </div>
             )}
 
-            <div className="mt-2 flex space-x-1">
-                <button type="button" onClick={nextButtonClick} className="px-3 py-1 bg-yellow-500 text-white rounded-md">Next</button>
-            </div>
-
             <div className="mt-2 p-2 border rounded-md bg-white shadow-md">
                 <h4 className="text-lg font-medium mb-1">Log de Operaciones</h4>
                 <div className="max-h-64 overflow-y-auto">
@@ -277,8 +277,8 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory }) => {
                 <h4 className="text-lg font-medium mb-1">Estadísticas de Caché</h4>
                 <p>Hits: {hitCount}</p>
                 <p>Misses: {missCount}</p>
-                <p>Hit Rate: {(hitCount / (hitCount + missCount) * 100).toFixed(2)}%</p>
-                <p>Miss Rate: {(missCount / (hitCount + missCount) * 100).toFixed(2)}%</p>
+                <p>Hit Rate: {hitCount + missCount === 0 ? '0.00%' : ((hitCount / (hitCount + missCount)) * 100).toFixed(2) + '%'}</p>
+                <p>Miss Rate: {hitCount + missCount === 0 ? '0.00%' : ((missCount / (hitCount + missCount)) * 100).toFixed(2) + '%'}</p>
             </div>
 
             <div className="mt-2 p-2 border rounded-md bg-white shadow-md">
