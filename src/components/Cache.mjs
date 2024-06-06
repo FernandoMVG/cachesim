@@ -103,7 +103,7 @@ export function init_cache(s_cc, s_blq) {
 export function modify(index, tag, address, matrix) {
     const valid_bit = 1;
     const dirty_bit = 0;
-    const start_address = Math.floor(address / s_blq);
+    const start_address = Math.floor(address / s_blq)*s_blq;
     const data_block = main_memory.slice(start_address, start_address + s_blq);
     // Update cache values
     matrix[index].splice(1, 4, valid_bit, tag, dirty_bit, data_block);

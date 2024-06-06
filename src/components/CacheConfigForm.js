@@ -299,7 +299,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
                 </div>
             </div>
 
-            {(location.pathname === '/fully-associative' || location.pathname === '/set-associative') && (
+            {(location.pathname === '/fully') && (
                 <div className="p-2 border rounded-md bg-white shadow-md">
                     <h4 className="text-lg font-medium mb-1">Política de Reemplazo</h4>
                     <div>

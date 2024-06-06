@@ -25,7 +25,7 @@ export function fully_associative_mapping(cache, address, tag, offset, replaceme
   let curr_line;
   const N_lines = Math.ceil(s_cc / s_blq);
   let logMessages = [];
-
+  console.log("HOLAAAAAA");
   //console.log("Cachefullymapp", cache);
   for (let i = 1; i <= N_lines; i++) {
     let line = cache[i];
