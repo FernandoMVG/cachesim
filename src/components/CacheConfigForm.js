@@ -2,14 +2,15 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { load_direct, store_direct } from './Direct.js';
 import { load_fully, store_fully } from './Fully.js';
-import { initCache, truncate_to_power_of_2, generate_random_string } from './CacheOperations';
+import { load_set, store_set } from './Set.js';
+import { initCache,initCacheSet, truncate_to_power_of_2, generate_random_string } from './CacheOperations';
 import { HighlightContext } from './HighlightContext';
 
 const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }) => {
     const location = useLocation();
     const [cacheSize, setCacheSize] = useState('16');
     const [blockSize, setBlockSize] = useState('8');
-    const [memorySize, setMemorySize] = useState('32');
+    const [memorySize, setMemorySize] = useState('256');
     const [data, setData] = useState([]);
     const [address, setAddress] = useState([]);
     const [isCacheCreated, setIsCacheCreated] = useState(false);
@@ -22,6 +23,10 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
     const [hitCount, setHitCount] = useState(0);
     const [missCount, setMissCount] = useState(0);
     const [comparisonLog, setComparisonLog] = useState('');
+    const [numSets, setNumSets] = useState('4');
+    const [fifo, setFifo] = useState([]);
+    const [lru, setLru] = useState([]);
+
 
     useEffect(() => {
         console.log(cache);
@@ -32,14 +37,34 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
         const validCacheSize = truncate_to_power_of_2(cacheSize);
         const validBlockSize = truncate_to_power_of_2(blockSize);
         const validMemorySize = truncate_to_power_of_2(memorySize);
+        let validNumSets = truncate_to_power_of_2(numSets); //set
+
+
+        if (validNumSets > 8) {
+            alert("The number of sets cannot exceed 8.");
+            validNumSets = 8;
+        }
+        setNumSets(validNumSets);
 
         setCacheSize(validCacheSize);
         setBlockSize(validBlockSize);
         setMemorySize(validMemorySize);
+        setNumSets(validNumSets); //set
 
-        const newCache = initCache(validCacheSize, validBlockSize);
-        setCache(newCache);
-        setIsCacheCreated(true);
+        if (location.pathname === '/set-associative') {
+            const [newCache, fifo, lru] = initCacheSet(validCacheSize, validBlockSize, validNumSets);
+            console.log("SetCaches", newCache);
+            setCache(newCache);
+            console.log("FIFO", fifo);
+            setFifo(fifo);
+            console.log("LRU", lru);
+            setLru(lru);
+            setIsCacheCreated(true);
+        } else {
+            const newCache = initCache(validCacheSize, validBlockSize);
+            setCache(newCache);
+            setIsCacheCreated(true);
+        }
 
         const initializedMemory = Array(validMemorySize).fill().map(() => generate_random_string((Math.floor(Math.random() * 8) + 3)));
         setMainMemory(initializedMemory);
@@ -68,20 +93,32 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
 
         let result;
         let logMessages = [];
-        if (location.pathname === '/fully-associative') {
-            if (instructionType === 'LOAD') {
-                result = load_fully(cache, currentAddress, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
-            } else if (instructionType === 'STORE') {
-                result = store_fully(cache, currentAddress, currentData, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
-            }
-            logMessages = result.log;
-        } else {
-            if (instructionType === 'LOAD') {
-                result = load_direct(cache, currentAddress, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
-            } else if (instructionType === 'STORE') {
-                result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
-            }
+        // Mapeo completamente asociativo
+    if (location.pathname === '/fully-associative') {
+        if (instructionType === 'LOAD') {
+            result = load_fully(cache, currentAddress, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+        } else if (instructionType === 'STORE') {
+            result = store_fully(cache, currentAddress, currentData, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
         }
+        logMessages = result.log;
+    } 
+    // Mapeo set-associative
+    else if (location.pathname === '/set-associative') {
+        if (instructionType === 'LOAD') {
+            result = load_set(cache, currentAddress, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory, fifo, lru, numSets);
+        } else if (instructionType === 'STORE') {
+            result = store_set(cache, currentAddress, currentData, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory, fifo, lru, numSets);
+        }
+        //logMessages = result.log;
+    } 
+    // Mapeo directo
+    else {
+        if (instructionType === 'LOAD') {
+            result = load_direct(cache, currentAddress, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+        } else if (instructionType === 'STORE') {
+            result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
+        }
+    }
         console.log("Cacheche: ", result)
         setCache(result.cache);
         console.log("MaintoMemory: ", result.mainMemory)
@@ -190,6 +227,20 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
                             className="mt-1 p-1 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                         />
                     </div>
+                    {location.pathname === '/set-associative' && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Number of Sets:
+                        </label>
+                        <input 
+                            type="number" 
+                            value={numSets} 
+                            onChange={(e) => setNumSets(parseInt(e.target.value))}
+                            placeholder="Number of Sets (power of 2)"
+                            className="mt-1 p-1 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                        />
+                            </div>
+                    )}
                 </div>
                 <div className="mt-2 flex justify-between">
                     <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded-md">Submit</button>
@@ -251,7 +302,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
                 </div>
             </div>
 
-            {location.pathname === '/fully-associative' && (
+            {(location.pathname === '/fully-associative' || location.pathname === '/set-associative') && (
                 <div className="p-2 border rounded-md bg-white shadow-md">
                     <h4 className="text-lg font-medium mb-1">Política de Reemplazo</h4>
                     <div>

@@ -26,8 +26,10 @@ export function fully_associative_mapping(cache, address, tag, offset, replaceme
   const N_lines = Math.ceil(s_cc / s_blq);
   let logMessages = [];
 
+  console.log("Cachefullymapp", cache);
   for (let i = 1; i <= N_lines; i++) {
     let line = cache[i];
+    console.log("Line", line);
     const [index, valid_bit, cached_tag] = line.slice(0, 3);
 
     // CACHE HIT
@@ -101,7 +103,7 @@ export function load_fully(cache, address, replacement_policy, write_policy = "B
   return { cache: newCache2, mainMemory: newMainMemory, message: hit ? `Cache hit! Address ${address} found ${cache_entry}` : `Cache miss. Address ${address} loaded`, log: logMessages, hit: hit, tag, offset };
 }
 
-export function fully_associative_modify(cache, address, data, tag, offset, replacement_policy, repl_queue, use_queue, write_policy, s_cc, s_blq, s_mp, main_memory) {
+export function fully_associative_modify(cache, address, data, tag, offset, replacement_policy, repl_queue, use_queue, write_policy, s_cc, s_blq, s_mp, main_memory, use="FULLY") {
   let w_mem = false;
   let hit = false;
   let empty_index = null;
@@ -164,7 +166,7 @@ export function fully_associative_modify(cache, address, data, tag, offset, repl
 
       // WRITES BACK IF NECESSARY DIRTY BIT == 1, BEFORE REPLACEMENT
       if (write_policy === "BACK" && cache[victim_index][3] === 1) {
-        write_mem(main_memory, cache[victim_index], "FULLY", s_cc, s_blq, s_mp);
+        write_mem(main_memory, cache[victim_index], use, s_cc, s_blq, s_mp);
         w_mem = true;
       }
 
@@ -179,7 +181,7 @@ export function fully_associative_modify(cache, address, data, tag, offset, repl
   }
 
   if (write_policy === "THROUGH") {
-    write_mem(main_memory, curr_line, "FULLY", s_cc, s_blq, s_mp);
+    write_mem(main_memory, curr_line, use, s_cc, s_blq, s_mp);
     w_mem = true;
   }
 

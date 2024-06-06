@@ -1,4 +1,5 @@
 // CacheOperations.js
+import { target_set } from './Set.js';
 
 export const initCache = (cacheSize, blockSize) => {
   if (blockSize >= cacheSize) {
@@ -8,6 +9,30 @@ export const initCache = (cacheSize, blockSize) => {
 
   return createCache(Math.ceil(cacheSize / blockSize));
 }
+
+export const initCacheSet = (cacheSize, blockSize, nSets) => {
+  if (blockSize >= cacheSize) {
+    alert("Block size must be smaller than cache size, cache not initialized");
+    return [];
+  }
+
+  return createCacheSet(cacheSize, blockSize, nSets);
+}
+
+export const createCacheSet = (s_cc, s_blq, nSets) => {
+  // Initialize caches
+  let array_caches = [];
+  let fifo_array = [];
+  let lru_array = [];
+  for (let i = 0; i < nSets; i++) {
+    array_caches.push(initCache(s_cc, s_blq));
+    fifo_array.push([]);
+    lru_array.push([]);
+  }
+  return [array_caches, fifo_array, lru_array];
+}
+
+
 
 export const createCache = (lines) => {
   const columnTitles = ['INDEX', 'VALID', 'TAG', 'DIRTY BIT', 'DATA'];
@@ -32,11 +57,11 @@ export function truncate_to_power_of_2(n) {
 }
 
 // PASS CACHE BLOCK TO MEMORY
-export function write_mem(main_memory,line, type = "DIRECT",s_cc,s_blq,s_mp,target_set=0) {
+export function write_mem(main_memory,line, type = "DIRECT",s_cc,s_blq,s_mp) {
   const index = line[0];
   const tagDecimal = parseInt(line[2], 2);
   let start_address;
-
+console.log("target set en write mem:", target_set)
   // RECONSTRUCT ORIGINAL ADDRESS
   if (type === "DIRECT") {
       start_address = (tagDecimal * (s_cc / s_blq) + line[0]) * s_blq;
