@@ -4,7 +4,7 @@
   </h1>
 
 <h4>
-    Aprende los distintos algoritmos interactuando con grafos
+    Realiza las diferentes tecnicas de mapeo de caché
   </h4>
 
 [![GitHub jfbenitezz](https://img.shields.io/badge/by-fjbenitezz-purple)](https://github.com/fjbenitezz)
@@ -12,3 +12,4 @@
 [![GitHub JaymedDLC](https://img.shields.io/badge/by-JaymedDLC-green)](https://github.com/JaymedDLC)
 
 </div>
+

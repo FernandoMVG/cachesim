@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: CacheSim_container
+    ports:
+      - "3000:3000" 
