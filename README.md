@@ -9,7 +9,7 @@
 
 [![GitHub jfbenitezz](https://img.shields.io/badge/by-fjbenitezz-purple)](https://github.com/fjbenitezz)
 [![GitHub FernandoMVG](https://img.shields.io/badge/by-FernandoMVG-blue)](https://github.com/FernandoMVG)
-[![GitHub JaymedDLC](https://img.shields.io/badge/by-JaymedDLC-green)](https://github.com/JaymedDLC)
+[![GitHub sets018](https://img.shields.io/badge/by-sets018-green)](https://github.com/sets018)
 
 </div>
 
@@ -53,3 +53,42 @@ Implementar una pestaña que permita comparar distintas configuraciones de mapeo
 
 Añadir una funcionalidad que permita generar estadísticas detalladas y gráficas sobre el rendimiento de cada configuración. Esto incluiría métricas como tasa de fallos de caché (cache miss rate), latencia de acceso, y eficiencia de utilización de la caché. Los usuarios podrían visualizar gráficos interactivos que les permitan analizar el comportamiento de la caché bajo diferentes cargas de trabajo, facilitando la interpretación de los datos y comprensión del sistema.
 
+## Instalación y Ejecución
+
+### Clonar el repositorio
+```
+git clone https://github.com/FernandoMVG/cachesim.git
+```
+```
+cd cachesim
+```
+
+### Ejecución con Docker
+Asegúrate de tener Docker instalado y ejecutando en tu sistema.
+
+- Este comando es para construir la imagen con Docker Compose e iniciar el `http://localhost:3000`
+```
+docker-compose up --build
+```
+
+- Si la imagen ya esta construida solo ejecuta:
+```
+docker-compose up
+```
+- Si deseas ejecutar los contenedores en segundo plano:
+```
+docker-compose up -d
+```
+
+Accede a la aplicación a través de `http://localhost:3000` en tu navegador.
+
+### Ejecución sin Docker
+Ve a la carpeta `app` y ejecuta:
+
+```
+npm install
+```
+```
+npm start
+```
+Accede a la aplicación a través de `http://localhost:3000` en tu navegador.
