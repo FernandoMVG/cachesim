@@ -28,6 +28,7 @@ export const createCacheSet = (s_cc, s_blq, nSets) => {
     array_caches.push(initCache(s_cc, s_blq));
     fifo_array.push([]);
     lru_array.push([]);
+    console.log("array_caches en createCacheSet:", array_caches)
   }
   return [array_caches, fifo_array, lru_array];
 }

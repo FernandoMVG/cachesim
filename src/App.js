@@ -131,7 +131,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/direct" element={<DirectMapped />} />
                 <Route path="/fully" element={<FullyAssociative />} />
-                <Route path="/set" element={<SetAssociative />} />
+                <Route path="/set-associative" element={<SetAssociative />} />
             </Routes>
         </Router>
     );

@@ -224,7 +224,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
                             className="mt-1 p-1 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                         />
                     </div>
-                    {location.pathname === '/set' && (
+                    {location.pathname === '/set-associative' && (
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Number of Sets:
