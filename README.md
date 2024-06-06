@@ -15,6 +15,12 @@
 
 # Simulador de Mapeo de Caché
 
+## Listado de Estudiantes
+
+- Felipe Jose Benitez Avilez
+- Fernando Mateo Valencia Gómez
+- Set Salas Redondo
+
 ## Resumen y Justificación de la Herramienta
 
 Este proyecto es un simulador de mapeo de caché que abarca los tres tipos principales de mapeo: mapeo directo, completamente asociativo y set asociativo. La herramienta ha sido desarrollada para ofrecer una comprensión práctica de cómo funcionan las diferentes técnicas de mapeo de caché en arquitecturas de sistemas computacionales.
@@ -46,10 +52,4 @@ Implementar una pestaña que permita comparar distintas configuraciones de mapeo
 ### Generación de Estadísticas y Gráficas
 
 Añadir una funcionalidad que permita generar estadísticas detalladas y gráficas sobre el rendimiento de cada configuración. Esto incluiría métricas como tasa de fallos de caché (cache miss rate), latencia de acceso, y eficiencia de utilización de la caché. Los usuarios podrían visualizar gráficos interactivos que les permitan analizar el comportamiento de la caché bajo diferentes cargas de trabajo, facilitando la interpretación de los datos y comprensión del sistema.
-
-## Listado de Estudiantes
-
-- Felipe Jose Benitez Avilez
-- Fernando Mateo Valencia Gómez
-- Set Salas Redondo
 
