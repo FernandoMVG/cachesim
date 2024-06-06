@@ -116,9 +116,7 @@ const Home = () => {
             <Link to="/fully" className="block w-full text-center py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
               Fully Associative Cache
             </Link>
-            <Link to="/set" className="block w-full text-center py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
-              Set Associative Cache
-            </Link>
+
           </div>
         </section>
       </div>
