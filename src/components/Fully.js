@@ -26,7 +26,7 @@ export function fully_associative_mapping(cache, address, tag, offset, replaceme
   const N_lines = Math.ceil(s_cc / s_blq);
   let logMessages = [];
 
-  console.log("Cachefullymapp", cache);
+  //console.log("Cachefullymapp", cache);
   for (let i = 1; i <= N_lines; i++) {
     let line = cache[i];
     console.log("Line", line);
@@ -208,7 +208,6 @@ function modify(index, tag, address, matrix, s_blq, main_memory) {
   const start_address = Math.floor(address / s_blq) * s_blq;
   const data_block = main_memory.slice(start_address, start_address + s_blq);
   // Actualiza los valores de la caché
-  console.log("Casto cheche cache");
   matrix[index] = [index - 1, valid_bit, tag, dirty_bit, data_block];
   return data_block;
 }

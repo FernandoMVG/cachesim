@@ -53,11 +53,11 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
 
         if (location.pathname === '/set-associative') {
             const [newCache, fifo, lru] = initCacheSet(validCacheSize, validBlockSize, validNumSets);
-            console.log("SetCaches", newCache);
+            //console.log("SetCaches", newCache);
             setCache(newCache);
-            console.log("FIFO", fifo);
+            //console.log("FIFO", fifo);
             setFifo(fifo);
-            console.log("LRU", lru);
+            //console.log("LRU", lru);
             setLru(lru);
             setIsCacheCreated(true);
         } else {
@@ -119,9 +119,8 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
             result = store_direct(cache, currentAddress, currentData, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
         }
     }
-        console.log("Cacheche: ", result)
         setCache(result.cache);
-        console.log("MaintoMemory: ", result.mainMemory)
+        //console.log("MaintoMemory: ", result.mainMemory)
         setMainMemory(result.mainMemory);
         setMemory(result.mainMemory);
         setLog(prevLog => [...prevLog, `${instructionType}: Address ${currentAddress} -> Data ${currentData ? currentData : mainMemory[currentAddress]}\n${result.message}`, ...logMessages]);
@@ -131,8 +130,6 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
         } else {
             setMissCount(missCount + 1);
         }
-
-        //setComparisonLog(prevLog => `${prevLog}\nAddress: ${currentAddress}, Tag: ${result.tag}, Index: ${result.index}, Offset: ${result.offset}`);
 
         setData(data.slice(1));
         setAddress(address.slice(1));
@@ -335,11 +332,6 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
                 <p>Misses: {missCount}</p>
                 <p>Hit Rate: {hitCount + missCount === 0 ? '0.00%' : ((hitCount / (hitCount + missCount)) * 100).toFixed(2) + '%'}</p>
                 <p>Miss Rate: {hitCount + missCount === 0 ? '0.00%' : ((missCount / (hitCount + missCount)) * 100).toFixed(2) + '%'}</p>
-            </div>
-
-            <div className="mt-2 p-2 border rounded-md bg-white shadow-md">
-                <h4 className="text-lg font-medium mb-1">Comparaciones</h4>
-                <textarea value={comparisonLog} readOnly rows="10" cols="50" className="mt-2 w-full p-1 border border-gray-300 rounded-md" />
             </div>
         </form>
     );

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 
 const CacheTable = ({ data }) => {
     useEffect(() => {
-        console.log('Data updated:', data);
+        //console.log('Data updated:', data);
     }, [data]);
 
     return (

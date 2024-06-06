@@ -38,11 +38,11 @@ export function set_bin_segmentation(address, s_cc, s_blq, s_mp, n_sets) {
     console.log(`Accessing set: ${target_set}\n`);
     const cache_set = newCache[target_set];
     console.table(cache_set);
-    console.log(fifo_array[target_set])
-    const result = fully_associative_mapping(cache_set, address, tag, offset, replacement_policy, fifo_array[target_set], lru_array[target_set], write_policy, s_cc, s_blq, s_mp, main_memory);
+    //console.log(fifo_array[target_set])
+    const [curr_line, cache_entry, w_mem, hit, logMessages] = fully_associative_mapping(cache_set, address, tag, offset, replacement_policy, fifo_array[target_set], lru_array[target_set], write_policy, s_cc, s_blq, s_mp, main_memory);
     newCache[target_set] = cache_set; // Ensure the modified set is saved back
-
-    return { cache: newCache, mainMemory: newMainMemory, tag, index, offset, hit: result.hit};
+    console.log("Result hit de load set", hit)
+    return { cache: newCache, mainMemory: newMainMemory, tag, index, offset, hit};
   }
   
   export function store_set(cache_arr, address, data, replacement_policy, write_policy = "BACK", s_cc, s_blq, s_mp, main_memory, fifo_array, lru_array, n_sets) {
@@ -59,6 +59,7 @@ export function set_bin_segmentation(address, s_cc, s_blq, s_mp, n_sets) {
     console.log(`Accessing set: ${target_set}`);
     console.log("target index", target_index)
     const [curr_line, cache_entry, w_mem, hit, logMessages] = fully_associative_modify(newCache[target_set], address, data, tag, offset, replacement_policy, fifo_array[target_set], lru_array[target_set], write_policy, s_cc, s_blq, s_mp, newMainMemory, "SET");
-    //console.log(result.hit ? `Cache hit! Address ${address} found ${result.cache_entry}` : `Cache miss. Address ${address} loaded`);
+    console.log("Result hit de store set", hit)
+    
     return { cache: newCache, mainMemory: newMainMemory, hit, tag, index, offset };
   }

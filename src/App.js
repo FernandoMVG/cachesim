@@ -1,6 +1,5 @@
-// App.js
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CacheConfigForm from './components/CacheConfigForm';
 import CacheTable from './components/CacheTable';
@@ -9,8 +8,6 @@ import MemoryTable from './components/MemoryTable';
 import InstructionBreakdown from './components/InstructionBreakdown';
 import InstructionBrkFully from './components/InstructionBrkFully'; 
 import { HighlightProvider } from './components/HighlightContext';
-
-
 
 const DirectMapped = () => {
     const [cache, setCache] = useState([]);
@@ -103,14 +100,40 @@ const SetAssociative = () => {
     );
 };
 
+const Home = () => {
+    return (
+      <div className="bg-gray-200 min-h-screen flex flex-col items-center justify-center">
+        <section className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-gray-900">Cachesim</h1>
+          <p className="text-xl text-gray-700">Cache Simulator</p>
+        </section>
+  
+        <section className="bg-white shadow-lg rounded-lg p-8 max-w-lg">
+          <div className="flex flex-col space-y-4">
+            <Link to="/direct" className="block w-full text-center py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
+              Direct Mapped Cache
+            </Link>
+            <Link to="/fully" className="block w-full text-center py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
+              Fully Associative Cache
+            </Link>
+            <Link to="/set" className="block w-full text-center py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
+              Set Associative Cache
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  };
+
 const App = () => {
     return (
         <Router>
             <Navbar />
             <Routes>
-                <Route path="/" element={<DirectMapped />} />
-                <Route path="/fully-associative" element={<FullyAssociative />} />
-                <Route path="/set-associative" element={<SetAssociative />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/direct" element={<DirectMapped />} />
+                <Route path="/fully" element={<FullyAssociative />} />
+                <Route path="/set" element={<SetAssociative />} />
             </Routes>
         </Router>
     );
