@@ -94,7 +94,7 @@ const CacheConfigForm = ({ cache, setCache, memory, setMemory, setSegmentation }
         let result;
         let logMessages = [];
         // Mapeo completamente asociativo
-    if (location.pathname === '/fully-associative') {
+    if (location.pathname === '/fully') {
         if (instructionType === 'LOAD') {
             result = load_fully(cache, currentAddress, replacePolicy, writePolicy, cacheSize, blockSize, memorySize, mainMemory);
         } else if (instructionType === 'STORE') {
