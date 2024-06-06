@@ -17,9 +17,9 @@
 
 ## Listado de Estudiantes
 
-- Felipe Jose Benitez Avilez
-- Fernando Mateo Valencia Gómez
-- Set Salas Redondo
+- Felipe Jose Benitez Avilez - NRC 2382
+- Fernando Mateo Valencia Gómez - NRC 2382
+- Set Salas Redondo - NRC 2381
 
 ## Resumen y Justificación de la Herramienta
 
