@@ -7,7 +7,7 @@
     Realiza las diferentes tecnicas de mapeo de caché
   </h4>
 
-[![GitHub jfbenitezz](https://img.shields.io/badge/by-fjbenitezz-purple)](https://github.com/fjbenitezz)
+[![GitHub jfbenitezz](https://img.shields.io/badge/by-jfbenitezz-purple)](https://github.com/jfbenitezz)
 [![GitHub FernandoMVG](https://img.shields.io/badge/by-FernandoMVG-blue)](https://github.com/FernandoMVG)
 [![GitHub sets018](https://img.shields.io/badge/by-sets018-green)](https://github.com/sets018)
 
